@@ -1,0 +1,73 @@
+body {
+  width: 20rem;
+}
+
+ul {
+  list-style-type: none;
+  padding-inline-start: 0;
+  margin: 1rem 0;
+}
+
+li {
+  padding: 0.25rem;
+}
+li:nth-child(odd) {
+  background: #80808030;
+}
+li:nth-child(even) {
+  background: #ffffff;
+}
+
+h3,
+p {
+  margin: 0;
+}
+.close {
+position: absolute;
+right: 0px;	
+}
+
+body {
+	width: 783px;
+	overflow-x:hidden;
+}
+
+html {
+	overflow-x: hidden;
+}
+
+.title {
+    width: 690px;
+    word-break: break-word;
+}
+
+.iconDiv, .tabContents , .closeDiv{
+	display: inline-grid;
+}
+
+.closeDiv {
+	flex: 5%;
+	
+}
+.tabContainer {
+display: flex;	
+color: black;
+text-decoration: none;
+align-items: flex-start;
+}
+
+.tabContainer:hover {
+    color: #001bae;
+}
+
+.pathname {
+	width:max-content;
+}
+
+.icon {
+	width: 32px;
+}
+
+button {
+	border-radius: 10px;
+}
