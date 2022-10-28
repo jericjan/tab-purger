@@ -71,3 +71,9 @@ align-items: flex-start;
 button {
 	border-radius: 10px;
 }
+
+.close {
+	background-color: #ff4b4b;
+    color: white;
+    font-weight: 700;
+}
