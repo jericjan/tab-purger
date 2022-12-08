@@ -14,9 +14,9 @@ async function doSearch() {
     document.querySelector("body > ul").innerHTML = ""
     var all_tabs = await chrome.tabs.query({});
     var tabs = []
-    var search = document.querySelector("input").value;
+    var search = document.querySelector("input").value.toLowerCase();
     for (let i = 0; i < all_tabs.length; i++) {
-        if (all_tabs[i].title.includes(search) || all_tabs[i].url.includes(search)) {
+        if (all_tabs[i].title.toLowerCase().includes(search) || all_tabs[i].url.toLowerCase().includes(search)) {
             tabs.push(all_tabs[i])
         }	
     }	
