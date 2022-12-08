@@ -1,12 +1,16 @@
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Collator
 
+var inputBox = document.querySelector("input")
+inputBox.focus()
+
 async function getTabCount() {
 var all_tabs = await chrome.tabs.query({});
 document.querySelector("#tabCount").innerHTML = all_tabs.length
 }
 await getTabCount()
-const search_button = document.querySelector("button#search");
-search_button.addEventListener("click", async () => {
+// const search_button = document.querySelector("button#search");
+
+async function doSearch() {
     document.querySelector("body > ul").innerHTML = ""
     var all_tabs = await chrome.tabs.query({});
     var tabs = []
@@ -55,9 +59,27 @@ search_button.addEventListener("click", async () => {
 	await getTabCount()
     //  const tabIds = tabs.map(({ id }) => id);
     // const group = await chrome.tabs.group({ tabIds });
-    //await chrome.tabGroups.update(group, { title: "DOCS" });
-});
-search_button.click()
+    //await chrome.tabGroups.update(group, { title: "DOCS" });	
+}
+
+// search_button.addEventListener("click", async () => {
+
+// });
+await doSearch()
+
+function debounce(callback, wait) {
+  let timeout;
+  return (...args) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(function () { callback.apply(this, args); }, wait);
+  };
+}
+
+inputBox.addEventListener("keyup",  debounce( async () => {
+	doSearch()
+}, 250))
+
+
 const purge_button = document.querySelector("button#purge");
 purge_button.addEventListener("click", async () => {
     var result_elems = document.querySelectorAll("ul > li > a")
