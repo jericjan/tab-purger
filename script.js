@@ -36,14 +36,25 @@ async function doSearch() {
         element.querySelector(".pathname").textContent = pathname;
 		element.querySelector(".iconDiv > img").src = faviUrl;
         element.querySelector("a").setAttribute('id', `tab-${tab.id}`);
-        element.querySelector("a").addEventListener("click", async () => {
+        element.querySelector("a").addEventListener("click", async (e) => {
             // need to focus window as well as the active tab
-            await chrome.tabs.update(tab.id, {
-                active: true
-            });
-            await chrome.windows.update(tab.windowId, {
-                focused: true
-            });
+
+            if (e.ctrlKey){
+                var selectedTabList = document.querySelectorAll(".selected")
+                selectedTabList.forEach(element => {
+                    element.className = ''
+                });
+
+                element.querySelector(`#tab-${tab.id}`).parentElement.className = 'selected'
+
+            } else{
+                await chrome.tabs.update(tab.id, {
+                    active: true
+                });
+                await chrome.windows.update(tab.windowId, {
+                    focused: true
+                });
+            }
         });
         element.querySelector(".close").addEventListener("click", async () => {
             // need to focus window as well as the active tab
@@ -90,3 +101,48 @@ purge_button.addEventListener("click", async () => {
     }
 	await getTabCount()
 });
+
+document.addEventListener('keyup', function (e) {
+    console.log(e.key)
+
+    function navigate(direction){
+
+        var tabList = document.querySelectorAll("body > ul > li")
+        var selectedItems = document.querySelectorAll(".selected")
+
+        if (selectedItems.length == 0) {
+            selectedItem = tabList[0]
+        } else {
+            var selectedItem = selectedItems[0]
+            selectedItem.className = ''
+
+            if (direction == 'up'){
+                selectedItem = (selectedItem.previousSibling != null) ? selectedItem.previousSibling : selectedItem
+            } else if (direction == 'down') {
+                selectedItem = (selectedItem.nextSibling != null) ? selectedItem.nextSibling : (selectedItem.previousSibling != null) ? selectedItem.previousSibling : selectedItem
+            }        
+        }
+
+        if (selectedItem != undefined){
+            selectedItem.className = 'selected'
+            selectedItem.scrollIntoView()
+        }
+        
+
+
+
+    }
+    if (document.activeElement != document.querySelector("input")) {
+        if (e.key == "k") { //Down      
+            navigate("down")
+        } else if (e.key == "j") { // Up
+            navigate("up")
+        } else if (e.key == "Delete") { // Delete
+            var selectedItems = document.querySelectorAll(".selected")
+            selectedItems.forEach(element => {
+                element.querySelector(".tabContainer > .closeDiv > button").click()
+            });
+            navigate("down")
+        }
+    }
+  });

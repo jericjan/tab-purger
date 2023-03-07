@@ -1,3 +1,7 @@
+html {
+  scroll-behavior: unset !important;
+}
+
 body {
   width: 20rem;
 }
@@ -76,4 +80,8 @@ button {
 	background-color: #ff4b4b;
     color: white;
     font-weight: 700;
+}
+
+.selected {
+  background-color: #ffaf81 !important;
 }
