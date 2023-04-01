@@ -85,3 +85,11 @@ button {
 .selected {
   background-color: #ffaf81 !important;
 }
+
+.current-tab {
+  background-color: #beff81 !important;
+}
+
+.current-tab.selected {
+  background-image: linear-gradient(90deg, #beff81, #ffaf81);
+}

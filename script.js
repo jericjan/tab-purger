@@ -10,9 +10,17 @@ document.querySelector("#tabCount").innerHTML = all_tabs.length
 await getTabCount()
 // const search_button = document.querySelector("button#search");
 
+async function getCurrentTab() {
+    let queryOptions = { active: true, lastFocusedWindow: true };
+    // `tab` will either be a `tabs.Tab` instance or `undefined`.
+    let [tab] = await chrome.tabs.query(queryOptions);
+    return tab;
+  }
+
 async function doSearch() {
     document.querySelector("body > ul").innerHTML = ""
     var all_tabs = await chrome.tabs.query({});
+    var current_tab = await getCurrentTab();
     var tabs = []
     var search = document.querySelector("input").value.toLowerCase();
     for (let i = 0; i < all_tabs.length; i++) {
@@ -42,10 +50,10 @@ async function doSearch() {
             if (e.ctrlKey){
                 var selectedTabList = document.querySelectorAll(".selected")
                 selectedTabList.forEach(element => {
-                    element.className = ''
+                    element.classList.remove('selected')
                 });
 
-                element.querySelector(`#tab-${tab.id}`).parentElement.className = 'selected'
+                element.querySelector(`#tab-${tab.id}`).parentElement.classList.add('selected')
 
             } else{
                 await chrome.tabs.update(tab.id, {
@@ -64,6 +72,9 @@ async function doSearch() {
 			await getTabCount()
             
         });
+        if (current_tab.id == tab.id) {
+            element.classList.add('current-tab')
+        }
         elements.add(element);
     }
     document.querySelector("ul").append(...elements);
@@ -114,7 +125,7 @@ document.addEventListener('keyup', function (e) {
             selectedItem = tabList[0]
         } else {
             var selectedItem = selectedItems[0]
-            selectedItem.className = ''
+            selectedItem.classList.remove('selected')
 
             if (direction == 'up'){
                 selectedItem = (selectedItem.previousSibling != null) ? selectedItem.previousSibling : selectedItem
@@ -124,7 +135,7 @@ document.addEventListener('keyup', function (e) {
         }
 
         if (selectedItem != undefined){
-            selectedItem.className = 'selected'
+            selectedItem.classList.add('selected')
             selectedItem.scrollIntoView()
         }
         
