@@ -2,9 +2,9 @@ class Tab {
 
     /**
      * 
-     * @param {Node} element - this is the HTML element that displays the tab
-     * @param {tabs.Tab} tab - this is the actual tab object
-     * @param {tabs.Tab} current_tab - the currently active tab
+     * @param {HTMLLIElement} element - this is the HTML element that displays the tab
+     * @param {chrome.tabs.Tab} tab - this is the actual tab object
+     * @param {chrome.tabs.Tab} current_tab - the currently active tab
      */
     constructor(element, tab, current_tab) {
       this.element = element;
@@ -22,6 +22,7 @@ class Tab {
         return this.element.querySelector(".close")
     }
 
+    /** returns the tab's unique ID, not to be confused with the element's own ID*/
     get id(){
         return this.tab.id
     }
@@ -37,7 +38,7 @@ class Tab {
         this.element.querySelector("a").setAttribute('id', `tab-${this.tab.id}`);        
     }
 
-    selectTab(tabId){
+    selectTab(){
 
         // unselects all tabs
         var selectedTabList = document.querySelectorAll(".selected")
@@ -50,9 +51,10 @@ class Tab {
     }
 
     async focusWindowTab(){
+
         await chrome.tabs.update(this.tab.id, {
             active: true
-        });
+        });        
         await chrome.windows.update(this.tab.windowId, {
             focused: true
         });        
@@ -71,20 +73,31 @@ class TabContainer {
 
 
     constructor(){        
-        this.elems = new Set() // a set of HTML elements
-        this.tabObjs = {} // a dict of Tab objects
+        /**
+         * a set of HTML elements
+         * @type {Set<HTMLLIElement>}
+         */        
+        this.elems = new Set() 
+
+        /**
+         * a dict of Tab objects
+         * @type {Object.<number, Tab>}
+         */  
+        this.tabObjs = {} // 
     }
 
+    /**    
+     * @param {Tab} tabObj - gets added to `tabObjs` dict
+     * @param {HTMLLIElement} tabObj.element - gets added to `elems`
+     */
     add(tabObj){
         this.elems.add(tabObj.element)
         this.tabObjs[tabObj.id] = tabObj
     }
 
+    /** @param {number} tabId */
     async closeTab(tabId){
-        console.log(`Closing tab ${tabId}.`)
-        if (typeof window.event !== "undefined"){
-            window.event.stopPropagation();
-        }        
+        console.log(`Closing tab ${tabId}.`) 
         await chrome.tabs.remove(tabId);
         document.querySelector(`#tab-${tabId}`).parentElement.remove()        
         delete this.tabObjs[tabId]
@@ -93,11 +106,12 @@ class TabContainer {
         // won't need to modify elems because it will be cleared out anyway everytime you doSearch() and elems is only used to append to "ul"
     }
 
+    /** Displays all elements in `elems` by appending it to `ul` */
     showAll(){
         document.querySelector("ul").append(...this.elems);
     }
 
-    /** Clears all HTML elements associated with tabs w/p actually closing any tabs */
+    /** Clears all HTML elements associated with tabs w/o actually closing any tabs */
     clearElems(){
         document.querySelector("body > ul").innerHTML = ""
 
@@ -106,6 +120,7 @@ class TabContainer {
         this.tabObjs = {}
     }
     
+    /** runs {@link closeTab()} on all currently displayed tabs */
     async purgeDisplayed(){
         for (const tabId in this.tabObjs){
             await this.closeTab(parseInt(tabId))

@@ -13,20 +13,22 @@ async function updateTabCount() {
     document.querySelector("#tabCount").innerHTML = all_tabs.length
 }
 await updateTabCount()
-// const search_button = document.querySelector("button#search");
 
+/** @returns {Promise<chrome.tabs.Tab|undefined>} */
 async function getCurrentTab() {
-    let queryOptions = { active: true, lastFocusedWindow: true };
-    // `tab` will either be a `tabs.Tab` instance or `undefined`.
+    let queryOptions = { active: true, lastFocusedWindow: true };    
+    
     let [tab] = await chrome.tabs.query(queryOptions);
     return tab;
 }
 
-/** Runs when the extension is opened, or when the user is typing on the search bar */
+/** 
+ * Searches for tabs and displays them  
+ * Runs when the extension is opened, or when the user is typing on the search bar */
 async function doSearch() {
     tabCont.clearElems()
     var all_tabs = await chrome.tabs.query({});
-    var current_tab = await getCurrentTab();    
+    var current_tab = await getCurrentTab();
     var search = document.querySelector("input").value.toLowerCase();
 
     const tabs = [...(function*() {
@@ -44,6 +46,8 @@ async function doSearch() {
     const template = document.getElementById("li_template");    
     
     for (const tab of tabs) {
+
+        /** @type {HTMLLIElement} */
         const element = template.content.firstElementChild.cloneNode(true);
 
         const tabObj = new Tab(element, tab, current_tab)
@@ -58,8 +62,9 @@ async function doSearch() {
                 await tabObj.focusWindowTab()
             }
         });
-        tabObj.closeButton.addEventListener("click", async () => {
+        tabObj.closeButton.addEventListener("click", async (e) => {
             // need to focus window as well as the active tab
+            e.stopPropagation();
             await tabCont.closeTab(tabObj.id)
             await updateTabCount()
 
@@ -77,9 +82,14 @@ async function doSearch() {
 }
 
 
+
 await doSearch()
 
-/** delays running a function until some time has passed*/
+/**
+ * delays running a function until some time has passed
+ * @param {function} callback - the function to run
+ * @param {number} wait - how long to wait
+ */
 function debounce(callback, wait) {
     let timeout;
     return (...args) => {
@@ -103,8 +113,13 @@ purge_button.addEventListener("click", async () => {
 });
 
 document.addEventListener('keyup', function (e) {
-    console.log(e.key)
-
+    
+    /**
+     * Navigates through the list of elements associated with the tabs  
+     * If none is currently selected, select the first item  
+     * If something is selected, unselect it, navigate up/down, and select the new item
+     * @param {string} direction - the direction to move towards
+     */
     function navigate(direction) {
 
         var tabList = document.querySelectorAll("body > ul > li")
@@ -129,6 +144,8 @@ document.addEventListener('keyup', function (e) {
         }
 
     }
+
+
     if (document.activeElement != document.querySelector("input")) {
         if (e.key == "k") { //Down      
             navigate("down")
