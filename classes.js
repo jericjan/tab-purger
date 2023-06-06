@@ -4,12 +4,12 @@ class Tab {
      * 
      * @param {HTMLLIElement} element - this is the HTML element that displays the tab
      * @param {chrome.tabs.Tab} tab - this is the actual tab object
-     * @param {chrome.tabs.Tab} current_tab - the currently active tab
+     * @param {chrome.tabs.Tab} currentTab - the currently active tab
      */
-    constructor(element, tab, current_tab) {
+    constructor(element, tab, currentTab) {
       this.element = element;
       this.tab = tab;
-      this.current_tab = current_tab
+      this.currentTab = currentTab
     }
 
     /** returns the "a" element associated with the tab */
@@ -62,7 +62,7 @@ class Tab {
 
     /** Checks if it's the current tab and if it is, gives it the appropriate class name */
     checkIfCurrentTab(){
-        if (this.current_tab.id == this.tab.id) {
+        if (this.currentTab.id == this.tab.id) {
             this.element.classList.add('current-tab')
         }
     }
@@ -87,8 +87,8 @@ class TabContainer {
     }
 
     /**    
-     * @param {Tab} tabObj - gets added to `tabObjs` dict
-     * @param {HTMLLIElement} tabObj.element - gets added to `elems`
+     * @param {Tab} tabObj - gets added to {@link tabObjs} dict
+     * @param {HTMLLIElement} tabObj.element - gets added to {@link elems}
      */
     add(tabObj){
         this.elems.add(tabObj.element)
