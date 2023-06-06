@@ -22,6 +22,11 @@ class Tab {
         return this.element.querySelector(".close")
     }
 
+    get id(){
+        return this.tab.id
+    }
+
+    /** Sets the title, URL, icon, and ID of the HTML element*/
     setContents(){
         const title = this.tab.title.trim();
         const pathname = this.tab.url;
@@ -53,12 +58,6 @@ class Tab {
         });        
     }
 
-    async closeTab(){
-        window.event.stopPropagation();
-        await chrome.tabs.remove(this.tab.id);
-        this.element.querySelector(`#tab-${this.tab.id}`).parentElement.remove()        
-    }
-
     /** Checks if it's the current tab and if it is, gives it the appropriate class name */
     checkIfCurrentTab(){
         if (this.current_tab.id == this.tab.id) {
@@ -70,34 +69,50 @@ class Tab {
 
 class TabContainer {
 
-    constructor(){
-        this.set = new Set()
+
+    constructor(){        
+        this.elems = new Set() // a set of HTML elements
+        this.tabObjs = {} // a dict of Tab objects
     }
 
-    add(elem){
-        this.set.add(elem)
+    add(tabObj){
+        this.elems.add(tabObj.element)
+        this.tabObjs[tabObj.id] = tabObj
+    }
+
+    async closeTab(tabId){
+        console.log(`Closing tab ${tabId}.`)
+        if (typeof window.event !== "undefined"){
+            window.event.stopPropagation();
+        }        
+        await chrome.tabs.remove(tabId);
+        document.querySelector(`#tab-${tabId}`).parentElement.remove()        
+        delete this.tabObjs[tabId]
+
+
+        // won't need to modify elems because it will be cleared out anyway everytime you doSearch() and elems is only used to append to "ul"
     }
 
     showAll(){
-        document.querySelector("ul").append(...this.set);
+        document.querySelector("ul").append(...this.elems);
+    }
+
+    /** Clears all HTML elements associated with tabs w/p actually closing any tabs */
+    clearElems(){
+        document.querySelector("body > ul").innerHTML = ""
+
+        // empty these cuz they'll get set again anyway
+        this.elems = new Set()
+        this.tabObjs = {}
+    }
+    
+    async purgeDisplayed(){
+        for (const tabId in this.tabObjs){
+            await this.closeTab(parseInt(tabId))
+        }
     }
 
 }
 
-class TabPurger {
 
-    constructor(){
-        this.displayedTabs = document.querySelectorAll("ul > li > a")
-    }
-
-    async closeAll(){
-        for (const tab of this.displayedTabs) {
-            let id = parseInt(tab.id.slice(4))
-            await chrome.tabs.remove(id);
-            document.querySelector(`#tab-${id}`).parentElement.remove()
-        }        
-    }
-
-}
-
-export { Tab, TabContainer, TabPurger };
+export { Tab, TabContainer };

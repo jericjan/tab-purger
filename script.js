@@ -1,10 +1,12 @@
-import { Tab, TabContainer, TabPurger } from "./classes.js";
+import { Tab, TabContainer } from "./classes.js";
 
 
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Collator
 
 var inputBox = document.querySelector("input")
 inputBox.focus()
+
+const tabCont = new TabContainer()
 
 async function updateTabCount() {
     var all_tabs = await chrome.tabs.query({});
@@ -20,23 +22,27 @@ async function getCurrentTab() {
     return tab;
 }
 
+/** Runs when the extension is opened, or when the user is typing on the search bar */
 async function doSearch() {
-    document.querySelector("body > ul").innerHTML = ""
+    tabCont.clearElems()
     var all_tabs = await chrome.tabs.query({});
-    var current_tab = await getCurrentTab();
-    var tabs = []
+    var current_tab = await getCurrentTab();    
     var search = document.querySelector("input").value.toLowerCase();
-    for (let i = 0; i < all_tabs.length; i++) {
-        if (all_tabs[i].title.toLowerCase().includes(search) || all_tabs[i].url.toLowerCase().includes(search)) {
-            tabs.push(all_tabs[i])
-        }
-    }
+
+    const tabs = [...(function*() {
+        for (let tab of all_tabs) {
+            if (tab.title.toLowerCase().includes(search) || tab.url.toLowerCase().includes(search)) {
+                yield tab
+            }
+        }})()
+    ]
+
     document.querySelector("#resultCount").innerHTML = tabs.length
     const collator = new Intl.Collator();
     tabs.sort((a, b) => collator.compare(a.title, b.title));
 
     const template = document.getElementById("li_template");    
-    var tabCont = new TabContainer()
+    
     for (const tab of tabs) {
         const element = template.content.firstElementChild.cloneNode(true);
 
@@ -54,14 +60,14 @@ async function doSearch() {
         });
         tabObj.closeButton.addEventListener("click", async () => {
             // need to focus window as well as the active tab
-            tabObj.closeTab()
+            await tabCont.closeTab(tabObj.id)
             await updateTabCount()
 
         });
 
         tabObj.checkIfCurrentTab()        
 
-        tabCont.add(tabObj.element)
+        tabCont.add(tabObj)
     }
     
     tabCont.showAll()
@@ -90,16 +96,10 @@ inputBox.addEventListener("keyup", debounce(async () => {
 const purge_button = document.querySelector("button#purge");
 purge_button.addEventListener("click", async () => {
 
-    const tabPurger = new TabPurger()
-    await tabPurger.closeAll()
+    await tabCont.purgeDisplayed()
 
-    // var result_elems = document.querySelectorAll("ul > li > a")
-    // for (let i = 0; i < result_elems.length; i++) {
-    //     let id = parseInt(result_elems[i].id.slice(4))
-    //     await chrome.tabs.remove(id);
-    //     document.querySelector(`#tab-${id}`).parentElement.remove()
-    // }
     await updateTabCount()
+
 });
 
 document.addEventListener('keyup', function (e) {
