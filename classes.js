@@ -1,15 +1,15 @@
 class Tab {
 
     /**
-     * 
+     * For managing a tab and the HTML associated with it.       
      * @param {HTMLLIElement} element - this is the HTML element that displays the tab
      * @param {chrome.tabs.Tab} tab - this is the actual tab object
-     * @param {chrome.tabs.Tab} current_tab - the currently active tab
+     * @param {chrome.tabs.Tab} currentTab - the currently active tab
      */
-    constructor(element, tab, current_tab) {
+    constructor(element, tab, currentTab) {
       this.element = element;
       this.tab = tab;
-      this.current_tab = current_tab
+      this.currentTab = currentTab
     }
 
     /** returns the "a" element associated with the tab */
@@ -62,33 +62,36 @@ class Tab {
 
     /** Checks if it's the current tab and if it is, gives it the appropriate class name */
     checkIfCurrentTab(){
-        if (this.current_tab.id == this.tab.id) {
+        if (this.currentTab.id == this.tab.id) {
             this.element.classList.add('current-tab')
         }
     }
 
 }    
 
+
 class TabContainer {
 
-
+    /** For managing all Tab (not chrome.tabs.Tab) objects and their respective HTML elements. */
     constructor(){        
         /**
-         * a set of HTML elements
+         * A set of HTML elements.  
+         * Used for displaying them all after all Tab objects have been added to the TabContainer
          * @type {Set<HTMLLIElement>}
          */        
         this.elems = new Set() 
 
         /**
-         * a dict of Tab objects
+         * A dict of Tab objects.  
+         * Used for getting the IDs of the tabs in order to close them.
          * @type {Object.<number, Tab>}
          */  
         this.tabObjs = {} // 
     }
 
     /**    
-     * @param {Tab} tabObj - gets added to `tabObjs` dict
-     * @param {HTMLLIElement} tabObj.element - gets added to `elems`
+     * @param {Tab} tabObj - gets added to {@link tabObjs} dict
+     * @param {HTMLLIElement} tabObj.element - gets added to {@link elems}
      */
     add(tabObj){
         this.elems.add(tabObj.element)

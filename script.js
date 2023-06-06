@@ -1,16 +1,15 @@
 import { Tab, TabContainer } from "./classes.js";
 
 
-// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Collator
-
 var inputBox = document.querySelector("input")
 inputBox.focus()
 
 const tabCont = new TabContainer()
 
+/** Counts all currently open tabs (not searched tabs) */
 async function updateTabCount() {
-    var all_tabs = await chrome.tabs.query({});
-    document.querySelector("#tabCount").innerHTML = all_tabs.length
+    var allTabs = await chrome.tabs.query({});
+    document.querySelector("#tabCount").innerHTML = allTabs.length
 }
 await updateTabCount()
 
@@ -27,30 +26,31 @@ async function getCurrentTab() {
  * Runs when the extension is opened, or when the user is typing on the search bar */
 async function doSearch() {
     tabCont.clearElems()
-    var all_tabs = await chrome.tabs.query({});
-    var current_tab = await getCurrentTab();
+    var allTabs = await chrome.tabs.query({});
+    var currentTab = await getCurrentTab();
     var search = document.querySelector("input").value.toLowerCase();
 
-    const tabs = [...(function*() {
-        for (let tab of all_tabs) {
+    /** Filtered tabs based on search query. Uses a generator function that gets turned into a normal array. */
+    const searchedTabs = [...(function*() {
+        for (let tab of allTabs) {
             if (tab.title.toLowerCase().includes(search) || tab.url.toLowerCase().includes(search)) {
                 yield tab
             }
         }})()
     ]
 
-    document.querySelector("#resultCount").innerHTML = tabs.length
+    document.querySelector("#resultCount").innerHTML = searchedTabs.length
     const collator = new Intl.Collator();
-    tabs.sort((a, b) => collator.compare(a.title, b.title));
+    searchedTabs.sort((a, b) => collator.compare(a.title, b.title));
 
     const template = document.getElementById("li_template");    
     
-    for (const tab of tabs) {
+    for (const tab of searchedTabs) {
 
         /** @type {HTMLLIElement} */
         const element = template.content.firstElementChild.cloneNode(true);
 
-        const tabObj = new Tab(element, tab, current_tab)
+        const tabObj = new Tab(element, tab, currentTab)
 
         tabObj.setContents()
 
@@ -62,8 +62,7 @@ async function doSearch() {
                 await tabObj.focusWindowTab()
             }
         });
-        tabObj.closeButton.addEventListener("click", async (e) => {
-            // need to focus window as well as the active tab
+        tabObj.closeButton.addEventListener("click", async (e) => {            
             e.stopPropagation();
             await tabCont.closeTab(tabObj.id)
             await updateTabCount()
@@ -103,8 +102,8 @@ inputBox.addEventListener("keyup", debounce(async () => {
 }, 250))
 
 
-const purge_button = document.querySelector("button#purge");
-purge_button.addEventListener("click", async () => {
+const purgeButton = document.querySelector("button#purge");
+purgeButton.addEventListener("click", async () => {
 
     await tabCont.purgeDisplayed()
 
@@ -113,7 +112,7 @@ purge_button.addEventListener("click", async () => {
 });
 
 document.addEventListener('keyup', function (e) {
-    
+
     /**
      * Navigates through the list of elements associated with the tabs  
      * If none is currently selected, select the first item  
