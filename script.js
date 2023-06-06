@@ -1,13 +1,16 @@
+import { Tab, TabContainer, TabPurger } from "./classes.js";
+
+
 // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl/Collator
 
 var inputBox = document.querySelector("input")
 inputBox.focus()
 
-async function getTabCount() {
-var all_tabs = await chrome.tabs.query({});
-document.querySelector("#tabCount").innerHTML = all_tabs.length
+async function updateTabCount() {
+    var all_tabs = await chrome.tabs.query({});
+    document.querySelector("#tabCount").innerHTML = all_tabs.length
 }
-await getTabCount()
+await updateTabCount()
 // const search_button = document.querySelector("button#search");
 
 async function getCurrentTab() {
@@ -15,7 +18,7 @@ async function getCurrentTab() {
     // `tab` will either be a `tabs.Tab` instance or `undefined`.
     let [tab] = await chrome.tabs.query(queryOptions);
     return tab;
-  }
+}
 
 async function doSearch() {
     document.querySelector("body > ul").innerHTML = ""
@@ -26,97 +29,83 @@ async function doSearch() {
     for (let i = 0; i < all_tabs.length; i++) {
         if (all_tabs[i].title.toLowerCase().includes(search) || all_tabs[i].url.toLowerCase().includes(search)) {
             tabs.push(all_tabs[i])
-        }	
-    }	
-	document.querySelector("#resultCount").innerHTML = tabs.length
+        }
+    }
+    document.querySelector("#resultCount").innerHTML = tabs.length
     const collator = new Intl.Collator();
     tabs.sort((a, b) => collator.compare(a.title, b.title));
 
-    const template = document.getElementById("li_template");
-    const elements = new Set();
+    const template = document.getElementById("li_template");    
+    var tabCont = new TabContainer()
     for (const tab of tabs) {
         const element = template.content.firstElementChild.cloneNode(true);
 
-        const title = tab.title.trim();
-        const pathname = tab.url;
-		const faviUrl = tab.favIconUrl
-        element.querySelector(".title").textContent = title;
-        element.querySelector(".pathname").textContent = pathname;
-		element.querySelector(".iconDiv > img").src = faviUrl;
-        element.querySelector("a").setAttribute('id', `tab-${tab.id}`);
-        element.querySelector("a").addEventListener("click", async (e) => {
-            // need to focus window as well as the active tab
+        const tabObj = new Tab(element, tab, current_tab)
 
-            if (e.ctrlKey){
-                var selectedTabList = document.querySelectorAll(".selected")
-                selectedTabList.forEach(element => {
-                    element.classList.remove('selected')
-                });
+        tabObj.setContents()
 
-                element.querySelector(`#tab-${tab.id}`).parentElement.classList.add('selected')
+        tabObj.aElem.addEventListener("click", async (e) => {            
 
-            } else{
-                await chrome.tabs.update(tab.id, {
-                    active: true
-                });
-                await chrome.windows.update(tab.windowId, {
-                    focused: true
-                });
+            if (e.ctrlKey) { // select tab            
+                tabObj.selectTab()                
+            } else { // focus window as well as the active tab
+                await tabObj.focusWindowTab()
             }
         });
-        element.querySelector(".close").addEventListener("click", async () => {
+        tabObj.closeButton.addEventListener("click", async () => {
             // need to focus window as well as the active tab
-			window.event.stopPropagation();
-            await chrome.tabs.remove(tab.id);
-            element.querySelector(`#tab-${tab.id}`).parentElement.remove()
-			await getTabCount()
-            
+            tabObj.closeTab()
+            await updateTabCount()
+
         });
-        if (current_tab.id == tab.id) {
-            element.classList.add('current-tab')
-        }
-        elements.add(element);
+
+        tabObj.checkIfCurrentTab()        
+
+        tabCont.add(tabObj.element)
     }
-    document.querySelector("ul").append(...elements);
-	await getTabCount()
-    //  const tabIds = tabs.map(({ id }) => id);
-    // const group = await chrome.tabs.group({ tabIds });
-    //await chrome.tabGroups.update(group, { title: "DOCS" });	
+    
+    tabCont.showAll()
+
+    await updateTabCount()
+
 }
 
-// search_button.addEventListener("click", async () => {
 
-// });
 await doSearch()
 
+/** delays running a function until some time has passed*/
 function debounce(callback, wait) {
-  let timeout;
-  return (...args) => {
-      clearTimeout(timeout);
-      timeout = setTimeout(function () { callback.apply(this, args); }, wait);
-  };
+    let timeout;
+    return (...args) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(function () { callback.apply(this, args); }, wait);
+    };
 }
 
-inputBox.addEventListener("keyup",  debounce( async () => {
-	doSearch()
+inputBox.addEventListener("keyup", debounce(async () => {
+    doSearch()
 }, 250))
 
 
 const purge_button = document.querySelector("button#purge");
 purge_button.addEventListener("click", async () => {
-    var result_elems = document.querySelectorAll("ul > li > a")
-    for (let i = 0; i < result_elems.length; i++) {
-		let id = parseInt(result_elems[i].id.slice(4))
-        await chrome.tabs.remove(id);
-		document.querySelector(`#tab-${id}`).parentElement.remove()
-    }
-	await getTabCount()
+
+    const tabPurger = new TabPurger()
+    await tabPurger.closeAll()
+
+    // var result_elems = document.querySelectorAll("ul > li > a")
+    // for (let i = 0; i < result_elems.length; i++) {
+    //     let id = parseInt(result_elems[i].id.slice(4))
+    //     await chrome.tabs.remove(id);
+    //     document.querySelector(`#tab-${id}`).parentElement.remove()
+    // }
+    await updateTabCount()
 });
 
 document.addEventListener('keyup', function (e) {
     console.log(e.key)
 
-    function navigate(direction){
+    function navigate(direction) {
 
         var tabList = document.querySelectorAll("body > ul > li")
         var selectedItems = document.querySelectorAll(".selected")
@@ -127,20 +116,17 @@ document.addEventListener('keyup', function (e) {
             var selectedItem = selectedItems[0]
             selectedItem.classList.remove('selected')
 
-            if (direction == 'up'){
+            if (direction == 'up') {
                 selectedItem = (selectedItem.previousSibling != null) ? selectedItem.previousSibling : selectedItem
             } else if (direction == 'down') {
                 selectedItem = (selectedItem.nextSibling != null) ? selectedItem.nextSibling : (selectedItem.previousSibling != null) ? selectedItem.previousSibling : selectedItem
-            }        
+            }
         }
 
-        if (selectedItem != undefined){
+        if (selectedItem != undefined) {
             selectedItem.classList.add('selected')
             selectedItem.scrollIntoView()
         }
-        
-
-
 
     }
     if (document.activeElement != document.querySelector("input")) {
@@ -156,4 +142,4 @@ document.addEventListener('keyup', function (e) {
             navigate("down")
         }
     }
-  });
+});
