@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "chrome-types": "^0.1.199"
+    "chrome-types": "^0.1.199",
+    "jsdoc": "^4.0.2"
   }
 }

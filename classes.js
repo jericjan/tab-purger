@@ -72,15 +72,8 @@ class Tab {
 
 class TabContainer {
 
-    /** For managing all Tab (not chrome.tabs.Tab) objects and their respective HTML elements. */
+    /** For managing all Tab (not chrome.tabs.Tab) objects */
     constructor(){        
-        /**
-         * A set of HTML elements.  
-         * Used for displaying them all after all Tab objects have been added to the TabContainer
-         * @type {Set<HTMLLIElement>}
-         */        
-        this.elems = new Set() 
-
         /**
          * A dict of Tab objects.  
          * Used for getting the IDs of the tabs in order to close them.
@@ -94,7 +87,6 @@ class TabContainer {
      * @param {HTMLLIElement} tabObj.element - gets added to {@link elems}
      */
     add(tabObj){
-        this.elems.add(tabObj.element)
         this.tabObjs[tabObj.id] = tabObj
     }
 
@@ -111,15 +103,22 @@ class TabContainer {
 
     /** Displays all elements in `elems` by appending it to `ul` */
     showAll(){
-        document.querySelector("ul").append(...this.elems);
+
+        const getElems = function*() {            
+            for (const tabId in this.tabObjs){  
+                yield this.tabObjs[tabId].element
+            }
+        }.bind(this)
+
+        const uniqueElems = new Set([...getElems()]) //removes dupes just in case
+        document.querySelector("ul").append(...uniqueElems);
     }
 
     /** Clears all HTML elements associated with tabs w/o actually closing any tabs */
     clearElems(){
         document.querySelector("body > ul").innerHTML = ""
 
-        // empty these cuz they'll get set again anyway
-        this.elems = new Set()
+        // empty this cuz it'll get set again anyway
         this.tabObjs = {}
     }
     
