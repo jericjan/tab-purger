@@ -75,19 +75,19 @@ class TabContainer {
     /** For managing all Tab (not chrome.tabs.Tab) objects */
     constructor(){        
         /**
-         * A dict of Tab objects.  
+         * A list of Tab objects.  
          * Used for getting the IDs of the tabs in order to close them.
-         * @type {Object.<number, Tab>}
+         * @type {Tab[]}
          */  
-        this.tabObjs = {} // 
+        this.tabObjs = []
     }
 
     /**    
      * @param {Tab} tabObj - gets added to {@link tabObjs} dict
      * @param {HTMLLIElement} tabObj.element - gets added to {@link elems}
      */
-    add(tabObj){
-        this.tabObjs[tabObj.id] = tabObj
+    add(tabObj){        
+        this.tabObjs.push(tabObj)
     }
 
     /** @param {number} tabId */
@@ -95,18 +95,21 @@ class TabContainer {
         console.log(`Closing tab ${tabId}.`) 
         await chrome.tabs.remove(tabId);
         document.querySelector(`#tab-${tabId}`).parentElement.remove()        
-        delete this.tabObjs[tabId]
 
+        const index = this.tabObjs.findIndex(function(item) {
+            return item.id === tabId;
+          });
+        console.log("it's at index", index)
+        this.tabObjs.splice(index, 1)
 
-        // won't need to modify elems because it will be cleared out anyway everytime you doSearch() and elems is only used to append to "ul"
     }
 
     /** Displays all elements in `elems` by appending it to `ul` */
     showAll(){
 
         const getElems = function*() {            
-            for (const tabId in this.tabObjs){  
-                yield this.tabObjs[tabId].element
+            for (const tabObj of this.tabObjs){  
+                yield tabObj.element
             }
         }.bind(this)
 
@@ -119,13 +122,19 @@ class TabContainer {
         document.querySelector("body > ul").innerHTML = ""
 
         // empty this cuz it'll get set again anyway
-        this.tabObjs = {}
+        this.tabObjs = []
     }
     
     /** runs {@link closeTab()} on all currently displayed tabs */
     async purgeDisplayed(){
-        for (const tabId in this.tabObjs){
-            await this.closeTab(parseInt(tabId))
+        const getIds = function*() {            
+            for (const tabObj of this.tabObjs){  
+                yield tabObj.id
+            }
+        }.bind(this)
+
+        for (const id of [...getIds()]){            
+            await this.closeTab(id)
         }
     }
 
