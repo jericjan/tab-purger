@@ -1,5 +1,6 @@
 # Tab Purger
 <img alt="" src="https://img.shields.io/github/repo-size/jericjan/tab-purger" />
+
 A [Chromium](https://en.wikipedia.org/wiki/Chromium_(web_browser)#Browsers_based_on_Chromium) extension that allows users to search and close tabs based on their title or URL.
 
 ## Installation
