@@ -5,9 +5,10 @@ A [Chromium](https://en.wikipedia.org/wiki/Chromium_(web_browser)#Browsers_based
 To install Tab Purger, follow these steps:
 
 1. Get the latest release from https://github.com/jericjan/tab-purger/releases
-2. Open your list of extensions at chrome://extensions/
-3. Drag the .crx to that page
-4. Done!
+2. Extract the zip to any folder (Can't provide a .crx file because it gets blocked by Chrome)
+3. Open your list of extensions at chrome://extensions/
+4. Click "Load unpacked" and select the folder you just extracted it to
+5. Done!
 
 ## Usage
 Once the extension is installed, you can click on it to search and close tabs in any Chromium browser.
