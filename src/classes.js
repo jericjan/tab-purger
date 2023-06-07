@@ -84,7 +84,6 @@ class TabContainer {
 
   /**
    * @param {Tab} tabObj - gets added to {@link tabObjs} dict
-   * @param {HTMLLIElement} tabObj.element - gets added to {@link elems}
    */
   add(tabObj) {
     this.tabObjs.push(tabObj);
@@ -108,7 +107,7 @@ class TabContainer {
     }
   }
 
-  /** Displays all elements in `elems` by appending it to `ul` */
+  /** Displays all elements stored in the Tab objects by appending it to `ul` */
   showAll() {
     const getElems = function* () {
       for (const tabObj of this.tabObjs) {
