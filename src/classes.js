@@ -65,7 +65,7 @@ class Tab {
     }
 
     /** Checks if it's the current tab and if it is, gives it the appropriate class name */
-    markCurrentTab(){
+    markIfCurrentTab(){
         if (this.isCurrentTab) {
             this.element.classList.add('current-tab')
         }
