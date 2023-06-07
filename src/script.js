@@ -69,7 +69,7 @@ async function doSearch() {
 
         });
 
-        tabObj.checkIfCurrentTab()        
+        tabObj.markCurrentTab()        
 
         tabCont.add(tabObj)
     }

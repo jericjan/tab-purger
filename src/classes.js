@@ -60,9 +60,13 @@ class Tab {
         });        
     }
 
+    get isCurrentTab(){
+        return this.currentTab.id == this.tab.id
+    }
+
     /** Checks if it's the current tab and if it is, gives it the appropriate class name */
-    checkIfCurrentTab(){
-        if (this.currentTab.id == this.tab.id) {
+    markCurrentTab(){
+        if (this.isCurrentTab) {
             this.element.classList.add('current-tab')
         }
     }
@@ -92,16 +96,17 @@ class TabContainer {
 
     /** @param {number} tabId */
     async closeTab(tabId){
-        console.log(`Closing tab ${tabId}.`) 
-        await chrome.tabs.remove(tabId);
-        document.querySelector(`#tab-${tabId}`).parentElement.remove()        
+        console.log(`Closing tab ${tabId}.`)    
 
         const index = this.tabObjs.findIndex(function(item) {
             return item.id === tabId;
           });
-        console.log("it's at index", index)
-        this.tabObjs.splice(index, 1)
-
+                
+        if (!this.tabObjs[index].isCurrentTab || confirm("This is the current tab! Are you sure you want to close it?")){
+            this.tabObjs.splice(index, 1)
+            await chrome.tabs.remove(tabId);
+            document.querySelector(`#tab-${tabId}`).parentElement.remove()    
+        } 
     }
 
     /** Displays all elements in `elems` by appending it to `ul` */
