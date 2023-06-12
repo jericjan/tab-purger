@@ -169,21 +169,26 @@ document.addEventListener("keyup", function (e) {
   }
 });
 
-document.querySelector("#blacklistBtn").addEventListener("click", async () => {
-  
+document.querySelector("#blacklistBtn").addEventListener("click", () => {
   var blacklist_query = document.querySelector("input").value;
-  
 
-  const element = document.querySelector("#blacklist_template").content.firstElementChild.cloneNode(true);
-  element.querySelector("p").textContent = blacklist_query
-  document.querySelector("#blackListUl").appendChild(element)
+  const element = document
+    .querySelector("#blacklist_template")
+    .content.firstElementChild.cloneNode(true);
+  element.querySelector("p").textContent = blacklist_query;
+  element.querySelector("input").checked = true;
+
+  if (!tabCont.blacklist.has(blacklist_query)) {
+    tabCont.addToBlacklist(blacklist_query);
+    element.querySelector(".rmBlacklist").addEventListener("click", () => {
+      tabCont.removeFromBlacklist(blacklist_query);
+      element.remove();
+    });
+
+    document.querySelector("#blackListUl").appendChild(element);
+  }
+
   // var blacklistItem = document.createElement("li");
   // blacklistItem.innerHTML = blacklist_query;
   // .appendChild(blacklistItem);
-
-  //await tabCont.blacklist(blacklist);
-  //await updateTabCount();
-
-
-}
-)
+});

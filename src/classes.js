@@ -80,6 +80,9 @@ class TabContainer {
      * @type {Tab[]}
      */
     this.tabObjs = [];
+
+    /** @type {Set<String>} */
+    this.blacklist = new Set();
   }
 
   /**
@@ -139,6 +142,15 @@ class TabContainer {
       await this.closeTab(id);
     }
   }
+
+  addToBlacklist(query){
+      this.blacklist.add(query);
+  }
+ 
+  removeFromBlacklist(query){
+    this.blacklist.delete(query)
+  }
+  
 }
 
 export { Tab, TabContainer };
