@@ -27,59 +27,60 @@ p {
   margin: 0;
 }
 .close {
-position: absolute;
-right: 0px;	
+  position: absolute;
+  right: 0px;
 }
 
 body {
-	width: 783px;
-	overflow-x:hidden;
+  width: 783px;
+  overflow-x: hidden;
 }
 
 html {
-	overflow-x: hidden;
+  overflow-x: hidden;
 }
 
 .title {
-    width: 690px;
-    word-break: break-word;
+  width: 690px;
+  word-break: break-word;
 }
 
-.iconDiv, .tabContents , .closeDiv{
-	display: inline-grid;
+.iconDiv,
+.tabContents,
+.closeDiv {
+  display: inline-grid;
 }
 
 .closeDiv {
-	flex: 5%;
-	
+  flex: 5%;
 }
 .tabContainer {
-display: flex;	
-color: black;
-text-decoration: none;
-align-items: flex-start;
+  display: flex;
+  color: black;
+  text-decoration: none;
+  align-items: flex-start;
 }
 
 .tabContainer:hover {
-    color: #001bae;
+  color: #001bae;
 }
 
 .pathname {
-	width:max-content;
+  width: max-content;
 }
 
 .icon {
-	width: 32px;
+  width: 32px;
 }
 
 button {
-	border-radius: 10px;
+  border-radius: 10px;
 }
 
 .close {
-	background-color: #ff4b4b;
-    color: white;
-    font-weight: 700;
+  background-color: #ff4b4b;
+  color: white;
+  font-weight: 700;
 }
 
 .selected {
@@ -92,4 +93,18 @@ button {
 
 .current-tab.selected {
   background-image: linear-gradient(90deg, #beff81, #ffaf81);
+}
+
+#blackListDiv {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20%;
+  height: 100%;
+  overflow-y: scroll;
+}
+
+.blackListItem {
+  display: flex;
+  justify-content: space-between;
 }

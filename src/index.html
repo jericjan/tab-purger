@@ -20,16 +20,32 @@
       </li>
     </template>
 	
+    <template id="blacklist_template">
+        <li class="blackListItem">            
+            <p>Item 1</p>
+            <button class="rmBlacklist">X</button>
+        </li>
+      </template>
+
 	<div class="text-center">
     <h1 >Kur0's Tab Purger</h1>
-	<div ><a>Tabs: </a><a id="tabCount">0</a><br></div>
-	<input></input><br>
-    <!-- <button id="search" class="mt-2 px-3 py-2 bg-success text-white">Search</button><br>	 -->
-	<button id="purge" class="mt-2 px-3 py-2 bg-danger text-white">Purge</button>
-	<div ><a>Results: </a><a id="resultCount">0</a><br></div>
+    <div  style="position: relative;">
+        <div >
+            <div ><a>Tabs: </a><a id="tabCount">0</a><br></div>
+            <input></input><br>
+            <!-- <button id="search" class="mt-2 px-3 py-2 bg-success text-white">Search</button><br>	 -->
+            <button id="purge" class="mt-2 px-3 py-2 bg-danger text-white">Purge</button>
+            <div ><a>Results: </a><a id="resultCount">0</a><br></div>
+        </div>
+        <div id="blackListDiv">
+            <button id="blacklistBtn">Add to Blacklist</button>
+            <ul id="blackListUl"></ul>
+
+        </div>
+    </div>
     <a><b>Ctrl+Click</b> - select tab | <b>j/k</b> - navigate tabs | <b>Delete key</b> - delete selected tab</a>
 	</div>
-    <ul></ul>
+    <ul id="tabListUl"></ul>
 
     <script src="./classes.js" type="module"></script>
     <script src="./script.js" type="module"></script>

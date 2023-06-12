@@ -80,6 +80,9 @@ class TabContainer {
      * @type {Tab[]}
      */
     this.tabObjs = [];
+
+    /** @type {Set<String>} */
+    this.blacklist = new Set();
   }
 
   /**
@@ -116,7 +119,7 @@ class TabContainer {
     }.bind(this);
 
     const uniqueElems = new Set([...getElems()]); //removes dupes just in case
-    document.querySelector("ul").append(...uniqueElems);
+    document.querySelector("#tabListUl").append(...uniqueElems);
   }
 
   /** Clears all HTML elements associated with tabs w/o actually closing any tabs */
@@ -138,6 +141,14 @@ class TabContainer {
     for (const id of [...getIds()]) {
       await this.closeTab(id);
     }
+  }
+
+  addToBlacklist(query) {
+    this.blacklist.add(query);
+  }
+
+  removeFromBlacklist(query) {
+    this.blacklist.delete(query);
   }
 }
 
