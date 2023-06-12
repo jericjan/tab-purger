@@ -168,3 +168,22 @@ document.addEventListener("keyup", function (e) {
     }
   }
 });
+
+document.querySelector("#blacklistBtn").addEventListener("click", async () => {
+  
+  var blacklist_query = document.querySelector("input").value;
+  
+
+  const element = document.querySelector("#blacklist_template").content.firstElementChild.cloneNode(true);
+  element.querySelector("p").textContent = blacklist_query
+  document.querySelector("#blackListUl").appendChild(element)
+  // var blacklistItem = document.createElement("li");
+  // blacklistItem.innerHTML = blacklist_query;
+  // .appendChild(blacklistItem);
+
+  //await tabCont.blacklist(blacklist);
+  //await updateTabCount();
+
+
+}
+)

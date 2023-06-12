@@ -116,7 +116,7 @@ class TabContainer {
     }.bind(this);
 
     const uniqueElems = new Set([...getElems()]); //removes dupes just in case
-    document.querySelector("ul").append(...uniqueElems);
+    document.querySelector("#tabListUl").append(...uniqueElems);
   }
 
   /** Clears all HTML elements associated with tabs w/o actually closing any tabs */

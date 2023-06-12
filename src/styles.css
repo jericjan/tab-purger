@@ -93,3 +93,18 @@ button {
 .current-tab.selected {
   background-image: linear-gradient(90deg, #beff81, #ffaf81);
 }
+
+
+#blackListDiv {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20%;
+  height: 100%;
+  overflow-y: scroll;
+}
+
+.blackListItem {
+  display: flex;
+  justify-content: space-between;
+}
