@@ -29,14 +29,34 @@ async function doSearch() {
   var currentTab = await getCurrentTab();
   var search = document.querySelector("input").value.toLowerCase();
 
+  /**
+   * Checks if a string includes any of the substrings in the given array.
+   *
+   * @param {string} str - The string to search in.
+   * @param {string[]} arr - The array of substrings to search for.
+   * @return {boolean} - Returns true if any of the substrings are found in the string, otherwise returns false.
+   */
+  function stringIncludesAny(str, arr) {
+    for (const bListStr of arr) {
+      if (str.includes(bListStr)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   /** Filtered tabs based on search query. Uses a generator function that gets turned into a normal array. */
   const searchedTabs = [
     ...(function* () {
       for (let tab of allTabs) {
-        if (
+        const titleOrUrlContainsSearch =
           tab.title.toLowerCase().includes(search) ||
-          tab.url.toLowerCase().includes(search)
-        ) {
+          tab.url.toLowerCase().includes(search);
+        const titleOrUrlIsBlacklisted =
+          stringIncludesAny(tab.title.toLowerCase(), tabCont.blacklist) ||
+          stringIncludesAny(tab.url.toLowerCase(), tabCont.blacklist);
+
+        if (titleOrUrlContainsSearch && !titleOrUrlIsBlacklisted) {
           yield tab;
         }
       }
@@ -176,7 +196,6 @@ document.querySelector("#blacklistBtn").addEventListener("click", () => {
     .querySelector("#blacklist_template")
     .content.firstElementChild.cloneNode(true);
   element.querySelector("p").textContent = blacklist_query;
-  element.querySelector("input").checked = true;
 
   if (!tabCont.blacklist.has(blacklist_query)) {
     tabCont.addToBlacklist(blacklist_query);
