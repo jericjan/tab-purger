@@ -202,9 +202,11 @@ document.querySelector("#blacklistBtn").addEventListener("click", () => {
     element.querySelector(".rmBlacklist").addEventListener("click", () => {
       tabCont.removeFromBlacklist(blacklist_query);
       element.remove();
+      doSearch();
     });
 
     document.querySelector("#blackListUl").appendChild(element);
+    doSearch();
   }
 
   // var blacklistItem = document.createElement("li");
