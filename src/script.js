@@ -208,8 +208,4 @@ document.querySelector("#blacklistBtn").addEventListener("click", () => {
     document.querySelector("#blackListUl").appendChild(element);
     doSearch();
   }
-
-  // var blacklistItem = document.createElement("li");
-  // blacklistItem.innerHTML = blacklist_query;
-  // .appendChild(blacklistItem);
 });
