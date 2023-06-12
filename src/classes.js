@@ -143,14 +143,13 @@ class TabContainer {
     }
   }
 
-  addToBlacklist(query){
-      this.blacklist.add(query);
+  addToBlacklist(query) {
+    this.blacklist.add(query);
   }
- 
-  removeFromBlacklist(query){
-    this.blacklist.delete(query)
+
+  removeFromBlacklist(query) {
+    this.blacklist.delete(query);
   }
-  
 }
 
 export { Tab, TabContainer };
