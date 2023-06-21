@@ -11,11 +11,6 @@ class Tab {
     this.currentTab = currentTab;
   }
 
-  /** returns the "a" element associated with the tab */
-  get aElem() {
-    return this.element.querySelector("a");
-  }
-
   /** returns the close button element of the tab */
   get closeButton() {
     return this.element.querySelector(".close");

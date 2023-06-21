@@ -77,7 +77,7 @@ async function doSearch() {
 
     tabObj.setContents();
 
-    tabObj.aElem.addEventListener("click", async (e) => {
+    tabObj.element.addEventListener("click", async (e) => {
       if (e.ctrlKey) {
         // select tab
         tabObj.selectTab();
