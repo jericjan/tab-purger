@@ -67,8 +67,10 @@ class Tab {
 }
 
 class TabContainer {
-  /** For managing all Tab (not chrome.tabs.Tab) objects */
-  constructor() {
+  /** For managing all Tab (not chrome.tabs.Tab) objects
+   * @param {function} doSearch - The function that searches for tabs. Used for the blacklist
+   */
+  constructor(doSearch) {
     /**
      * A list of Tab objects.
      * Used for getting the IDs of the tabs in order to close them.
@@ -78,6 +80,11 @@ class TabContainer {
 
     /** @type {Set<String>} */
     this.blacklist = new Set();
+
+    /** @type {function}
+     * @returns {Promise<void>}
+     */
+    this.doSearch = doSearch;
   }
 
   /**
@@ -138,12 +145,74 @@ class TabContainer {
     }
   }
 
-  addToBlacklist(query) {
-    this.blacklist.add(query);
+  /**
+   * Runs when the user clicks the "Add to Blacklist" button, and when the extension is first opened
+   * @param {string} input - The blacklist query to be added
+   * @param {boolean} init - A boolean that tells if the extension was just opened or if the button was clicked
+   */
+  async onBlacklistBtnClick(input, init = false) {
+    console.log("thi is:");
+    console.log(this);
+    var blacklist_query = input;
+
+    const element = document
+      .querySelector("#blacklist_template")
+      .content.firstElementChild.cloneNode(true);
+    element.querySelector("p").textContent = blacklist_query;
+
+    if (!this.blacklist.has(blacklist_query) || init == true) {
+      await this.addToBlacklist(blacklist_query);
+      element
+        .querySelector(".rmBlacklist")
+        .addEventListener("click", async () => {
+          await this.removeFromBlacklist(blacklist_query);
+          element.remove();
+          this.doSearch();
+        });
+
+      document.querySelector("#blackListUl").appendChild(element);
+      if (init == false) {
+        this.doSearch();
+      }
+    } else {
+      console.log("Already in blacklist");
+    }
   }
 
-  removeFromBlacklist(query) {
+  /**
+   * Adds a query to the blacklist
+   * @param {string} query - The query to add
+   */
+  async addToBlacklist(query) {
+    this.blacklist.add(query);
+    await this.saveBlacklist();
+  }
+
+  /**
+   * Removes a query from the blacklist
+   * @param {string} query - The query to remove
+   */
+  async removeFromBlacklist(query) {
     this.blacklist.delete(query);
+    await this.saveBlacklist();
+  }
+
+  /**
+   * Saves the entire blacklist to local storage
+   */
+  async saveBlacklist() {
+    await chrome.storage.local.set({ blacklist: [...this.blacklist] });
+  }
+
+  /**
+   * Loads the entire blacklist from local storage on startup
+   */
+  async loadBlacklist() {
+    const storage = await chrome.storage.local.get(["blacklist"]);
+    this.blacklist = new Set(storage.blacklist);
+    for (const item of this.blacklist) {
+      await this.onBlacklistBtnClick(item, true);
+    }
   }
 }
 
