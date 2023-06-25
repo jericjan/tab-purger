@@ -3,7 +3,8 @@ import { Tab, TabContainer } from "./classes.js";
 var inputBox = document.querySelector("input");
 inputBox.focus();
 
-const tabCont = new TabContainer();
+const tabCont = new TabContainer(doSearch);
+tabCont.loadBlacklist();
 
 /** Counts all currently open tabs (not searched tabs) */
 async function updateTabCount() {
@@ -189,23 +190,9 @@ document.addEventListener("keyup", function (e) {
   }
 });
 
-document.querySelector("#blacklistBtn").addEventListener("click", () => {
-  var blacklist_query = document.querySelector("input").value;
-
-  const element = document
-    .querySelector("#blacklist_template")
-    .content.firstElementChild.cloneNode(true);
-  element.querySelector("p").textContent = blacklist_query;
-
-  if (!tabCont.blacklist.has(blacklist_query)) {
-    tabCont.addToBlacklist(blacklist_query);
-    element.querySelector(".rmBlacklist").addEventListener("click", () => {
-      tabCont.removeFromBlacklist(blacklist_query);
-      element.remove();
-      doSearch();
-    });
-
-    document.querySelector("#blackListUl").appendChild(element);
-    doSearch();
-  }
+document.querySelector("#blacklistBtn").addEventListener("click", async () => {
+  await tabCont.onBlacklistBtnClick.bind(tabCont)(
+    document.querySelector("input").value
+  );
 });
+

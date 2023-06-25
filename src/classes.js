@@ -68,7 +68,7 @@ class Tab {
 
 class TabContainer {
   /** For managing all Tab (not chrome.tabs.Tab) objects */
-  constructor() {
+  constructor(doSearch) {
     /**
      * A list of Tab objects.
      * Used for getting the IDs of the tabs in order to close them.
@@ -78,6 +78,8 @@ class TabContainer {
 
     /** @type {Set<String>} */
     this.blacklist = new Set();
+
+    this.doSearch = doSearch;
   }
 
   /**
@@ -138,12 +140,55 @@ class TabContainer {
     }
   }
 
-  addToBlacklist(query) {
-    this.blacklist.add(query);
+  async onBlacklistBtnClick(input, init = false) {
+    console.log("thi is:");
+    console.log(this);
+    var blacklist_query = input;
+
+    const element = document
+      .querySelector("#blacklist_template")
+      .content.firstElementChild.cloneNode(true);
+    element.querySelector("p").textContent = blacklist_query;
+
+    if (!this.blacklist.has(blacklist_query) || init == true) {
+      await this.addToBlacklist(blacklist_query);
+      element
+        .querySelector(".rmBlacklist")
+        .addEventListener("click", async () => {
+          await this.removeFromBlacklist(blacklist_query);
+          element.remove();
+          this.doSearch();
+        });
+
+      document.querySelector("#blackListUl").appendChild(element);
+      if (init == false) {
+        this.doSearch();
+      }
+    } else {
+      console.log("Already in blacklist");
+    }
   }
 
-  removeFromBlacklist(query) {
+  async addToBlacklist(query) {
+    this.blacklist.add(query);
+    await this.saveBlacklist();
+  }
+
+  async removeFromBlacklist(query) {
     this.blacklist.delete(query);
+    await this.saveBlacklist();
+  }
+
+  async saveBlacklist() {
+    await chrome.storage.local.set({ blacklist: [...this.blacklist] });
+  }
+
+  async loadBlacklist() {
+    const storage = await chrome.storage.local.get(["blacklist"]);
+    this.blacklist = new Set(storage.blacklist);
+    for (const item of this.blacklist) {
+      await this.onBlacklistBtnClick(item, true);
+    }
   }
 }
 
