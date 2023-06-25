@@ -136,9 +136,9 @@ purgeButton.addEventListener("click", async () => {
 
 document.addEventListener("keyup", function (e) {
   /**
-   * Navigates through the list of elements associated with the tabs
-   * If none is currently selected, select the first item
-   * If something is selected, unselect it, navigate up/down, and select the new item
+   * Navigates through the list of elements associated with the tabs.
+   * If none is currently selected, select the first item.
+   * If something is selected, unselect it, navigate up/down, and select the new item.
    * @param {string} direction - the direction to move towards
    */
   function navigate(direction) {

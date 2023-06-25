@@ -22,3 +22,8 @@ To close a tab, click the close button next to the tab's title. If the tab you'r
 There is a big red button labelled "Purge". Clicking this will close all currently displayed tabs. Be careful not to purge *all* of your tabs.
 
 You can also use keyboard shortcuts to navigate through the list of tabs and close tabs. Press "J" to move up, "K" to move down, and "Delete" to close the selected tab. The selected tab will be colored orange. To select a tab with mouse, you can press Ctrl + Left Click.
+
+## Checklist before committing:
+- Run minify.bat
+- Update manifest.json's patch number
+- Update documentation
