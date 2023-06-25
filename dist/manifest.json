@@ -1,9 +1,10 @@
 {
   "manifest_version": 3,
   "name": "Kur0's Tab Purger",
-  "version": "4.1.0",
+  "version": "4.2.0",
   "permissions": [
-    "tabs"
+    "tabs",
+    "storage"
   ],
   "description": "A tab manager that lets you purge the search results with one click!",
   "icons": {

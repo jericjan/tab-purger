@@ -195,4 +195,3 @@ document.querySelector("#blacklistBtn").addEventListener("click", async () => {
     document.querySelector("input").value
   );
 });
-
