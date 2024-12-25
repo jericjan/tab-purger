@@ -134,14 +134,14 @@ purgeButton.addEventListener("click", async () => {
   await updateTabCount();
 });
 
-document.addEventListener("keyup", function (e) {
+document.addEventListener("keyup", async function (e) {
   /**
    * Navigates through the list of elements associated with the tabs.
    * If none is currently selected, select the first item.
    * If something is selected, unselect it, navigate up/down, and select the new item.
    * @param {string} direction - the direction to move towards
    */
-  function navigate(direction) {
+  async function navigate(direction) {
     var tabList = document.querySelectorAll("body > ul > li");
     var selectedItems = document.querySelectorAll(".selected");
 
@@ -169,23 +169,24 @@ document.addEventListener("keyup", function (e) {
     if (selectedItem != undefined) {
       selectedItem.classList.add("selected");
       selectedItem.scrollIntoView();
+      await chrome.storage.local.set({ lastSelectedTab: selectedItem.children[0].id });    
     }
   }
 
   if (document.activeElement != document.querySelector("input")) {
     if (e.key == "k") {
       //Down
-      navigate("down");
+      await navigate("down");
     } else if (e.key == "j") {
       // Up
-      navigate("up");
+      await navigate("up");
     } else if (e.key == "Delete") {
       // Delete
       var selectedItems = document.querySelectorAll(".selected");
       selectedItems.forEach((element) => {
         element.querySelector(".tabContainer > .closeDiv > button").click();
       });
-      navigate("down");
+      await navigate("down");
     }
   }
 });
@@ -195,3 +196,16 @@ document.querySelector("#blacklistBtn").addEventListener("click", async () => {
     document.querySelector("input").value
   );
 });
+
+const lastTabID = await chrome.storage.local.get("lastSelectedTab");
+if (Object.keys(lastTabID).length != 0 && lastTabID.lastSelectedTab != '') {
+  const elem = document.querySelector("#" + lastTabID.lastSelectedTab);
+  if (elem != undefined) {
+    document.activeElement.blur(); // deselects input box
+    const parent = elem.parentElement;
+    parent.classList.add("selected");
+    parent.scrollIntoView();
+  }
+}
+
+

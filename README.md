@@ -23,6 +23,12 @@ There is a big red button labelled "Purge". Clicking this will close all current
 
 You can also use keyboard shortcuts to navigate through the list of tabs and close tabs. Press "J" to move up, "K" to move down, and "Delete" to close the selected tab. The selected tab will be colored orange. To select a tab with mouse, you can press Ctrl + Left Click.
 
+## Dependencies
+Install these globally via npm/pnpm before running minify.bat:
+- `terser`
+- `clean-css-cli`
+- `html-minifier`
+
 ## Checklist before committing:
 - Run minify.bat
 - Update manifest.json's patch number
